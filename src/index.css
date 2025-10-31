@@ -19,6 +19,14 @@ nav a {
 nav a.active{
   text-decoration: underline;
 }
+.login {
+  border: #646cff33 2px solid;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  margin: auto;
+}
 /*  */
 a {
   font-weight: 500;
