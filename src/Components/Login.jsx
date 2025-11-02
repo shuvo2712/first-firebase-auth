@@ -1,20 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  createUserWithEmailAndPassword,
   GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
 import { auth } from "../Firebase/firebase.config";
+import { Link } from "react-router";
 
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
 const Login = () => {
-  const [user, setUser] = React.useState(null);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState("")
+
+  // Email Log In
+  const handleEmailLogIn = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    console.log("log in btn clicked", email, password);
+
+    setError("")
+    // fn
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        setUser(user);
+      })
+      .catch((error) => {
+        console.log(error.message);
+        setError(error.message)
+      });
+  };
 
   // Google Sign In
-  const handleSignInGoogle = () => {
+  const handleGoogleSignIn = () => {
     console.log("Google login button clicked");
 
     signInWithPopup(auth, googleProvider)
@@ -28,7 +52,7 @@ const Login = () => {
   };
 
   // Github Sign In
-  const handleSignInGitHub = () => {
+  const handleGitHubSignIn = () => {
     console.log("GitHub login button clicked");
 
     signInWithPopup(auth, githubProvider)
@@ -52,12 +76,13 @@ const Login = () => {
       })
       .catch((error) => {
         console.log("ERROR :", error);
+        setError(error.message)
       });
   };
 
   return (
-    <div className="flex  items-center">
-      <h1>Login</h1>
+    <div className="flex flex-col items-center">
+      <h1 className="text-5xl font-bold">Login</h1>
 
       {user ? (
         //   if user is logged in
@@ -71,10 +96,39 @@ const Login = () => {
       ) : (
         //   if no user
         <div>
+          {/* Email, password */}
+          <div>
+            <form onSubmit={handleEmailLogIn}>
+              <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+                <legend className="fieldset-legend"></legend>
+
+                <label className="label">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  className="input"
+                  placeholder="Email"
+                />
+
+                <label className="label">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  className="input"
+                  placeholder="Password"
+                />
+
+                <button className="btn btn-neutral mt-4">Login</button>
+              </fieldset>
+            </form>
+            {/* error */}
+            {error && <p className="text-red-500">{error}</p>}
+          </div>
+
           {/* Google */}
           <button
-            onClick={handleSignInGoogle}
-            className="btn bg-white text-black border-[#e5e5e5]"
+            onClick={handleGoogleSignIn}
+            className="btn bg-white text-black border-[#e5e5e5] mt-5 w-full"
           >
             <svg
               aria-label="Google logo"
@@ -106,10 +160,11 @@ const Login = () => {
             Login with Google
           </button>
           <br />
+
           {/* GitHub */}
           <button
-            onClick={handleSignInGitHub}
-            className="btn bg-black text-white border-black"
+            onClick={handleGitHubSignIn}
+            className="btn bg-black text-white border-black mt-5 w-full"
           >
             <svg
               aria-label="GitHub logo"
@@ -125,6 +180,14 @@ const Login = () => {
             </svg>
             Login with GitHub
           </button>
+
+          {/* register */}
+          <p>
+            New here?{" "}
+            <Link to="/register" className="text-blue-500 underline">
+              Register
+            </Link>
+          </p>
         </div>
       )}
     </div>

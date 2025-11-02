@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { auth } from "../Firebase/firebase.config";
+import { Link } from "react-router";
 
 const Register = () => {
   const [error, setError] = useState(null);
@@ -17,6 +18,7 @@ const Register = () => {
     setError(null);
     setSuccess(false);
 
+    // fn
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log("User registered:", result.user);
@@ -65,6 +67,12 @@ const Register = () => {
                 <button className="btn btn-neutral mt-4">Register</button>
               </fieldset>
             </form>
+            <p>
+              Already have an account?{" "}
+              <Link to="/login" className="text-blue-500 underline">
+                Login
+              </Link>
+            </p>
           </div>
         </div>
       </div>
