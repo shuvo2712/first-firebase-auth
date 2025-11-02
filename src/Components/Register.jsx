@@ -1,14 +1,33 @@
-import React from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
+import { auth } from "../Firebase/firebase.config";
 
 const Register = () => {
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // handle register
   const handleRegister = (event) => {
     event.preventDefault();
-    console.log("Register form submitted");
-    const form = event.target;
-    const email = form.email.value;
-    const password = form.password.value;
+    console.log("Register form submitted", event.target);
 
-    console.log(email, password);
+    // reset error and success
+    setError(null);
+    setSuccess(false);
+
+    createUserWithEmailAndPassword(
+      auth,
+      event.target.email.value,
+      event.target.password.value
+    )
+      .then((result) => {
+        console.log("User registered:", result.user);
+        setSuccess(true);
+      })
+      .catch((error) => {
+        console.log("ERROR :", error);
+        setError(error.message);
+      });
   };
 
   return (
@@ -21,6 +40,13 @@ const Register = () => {
           <div className="card-body">
             {/* form */}
             <form onSubmit={handleRegister}>
+              {/* success */}
+              {success && (<p className="text-green-500">
+                User registered successfully!
+              </p>
+              )}
+              {/* error */}
+              {error && <p className="text-red-500">{error}</p>}
               <fieldset className="fieldset">
                 <label className="label">Email</label>
                 <input
@@ -39,7 +65,7 @@ const Register = () => {
                 <div>
                   <a className="link link-hover">Forgot password?</a>
                 </div>
-                <button className="btn btn-neutral mt-4">Login</button>
+                <button className="btn btn-neutral mt-4">Register</button>
               </fieldset>
             </form>
           </div>
