@@ -9,17 +9,15 @@ const Register = () => {
   // handle register
   const handleRegister = (event) => {
     event.preventDefault();
-    console.log("Register form submitted", event.target);
+    const email = event.target.email.value;
+    const password = event.target.password.value;
+    console.log("Register form submitted", email, password);
 
     // reset error and success
     setError(null);
     setSuccess(false);
 
-    createUserWithEmailAndPassword(
-      auth,
-      event.target.email.value,
-      event.target.password.value
-    )
+    createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log("User registered:", result.user);
         setSuccess(true);
@@ -41,9 +39,8 @@ const Register = () => {
             {/* form */}
             <form onSubmit={handleRegister}>
               {/* success */}
-              {success && (<p className="text-green-500">
-                User registered successfully!
-              </p>
+              {success && (
+                <p className="text-green-500">User registered successfully!</p>
               )}
               {/* error */}
               {error && <p className="text-red-500">{error}</p>}
