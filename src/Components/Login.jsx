@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   GithubAuthProvider,
   GoogleAuthProvider,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -17,6 +18,7 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const emailRef = useRef()
 
   // handleShowPassword
   const handleShowPassword = (e) => {
@@ -24,12 +26,27 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleForgetPass = (e) => {
+    const email = emailRef.current.value;
+    console.log("Forget pass clicked", email)
+    
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        setError("SUCCESS : pls check email");
+      })
+      .catch((error) => {
+        setError("ERROR : ", error.message);
+      });
+    
+  }
+
   // Email Log In
   const handleEmailLogIn = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log("Email login btn clicked", email, password);
+    // 
+    console.log("LOGIN Btn clicked", "(", email, password, ")");
 
     // reset error
     setError("");
@@ -37,14 +54,16 @@ const Login = () => {
     // fn
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
-        console.log("LOGIN :", result.user);
-        if (!result.user.emailVerified.value) {
+        // 
+        console.log("LOGIN :", result.user.emailVerified);
+        if (!result.user.emailVerified) {
           setError("pls verify email")
           return
         }
         setUser(result.user);
       })
       .catch((error) => {
+        // 
         console.log("ERROR :", error.message);
         setError(error.message);
       });
@@ -102,7 +121,6 @@ const Login = () => {
         </div>
         {/* Left / Down Section */}
         {!user ? (
-          //   if no user
           <section className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
             <div className="card-body">
               <div>
@@ -113,6 +131,7 @@ const Login = () => {
                   <fieldset className="fieldset">
                     <label className="label">Email</label>
                     <input
+                      ref={emailRef}
                       name="email"
                       type="email"
                       className="input"
@@ -132,7 +151,7 @@ const Login = () => {
                       placeholder="Password"
                     />
                     <div>
-                      <a className="link link-hover">Forgot password?</a>
+                      <a onClick={handleForgetPass} className="link link-hover">Forgot password?</a>
                     </div>
                     <button className="btn btn-neutral mt-4">Login</button>
                   </fieldset>
@@ -207,8 +226,7 @@ const Login = () => {
           //   if user is logged in
           <div className="flex flex-col items-center">
             <h3>{user?.displayName}</h3>
-              <img src={user?.photoURL} alt=""
-            className="w-48"  />
+            <img src={user?.photoURL} alt="" className="w-48" />
             <h3>{user?.email}</h3>
             {!user.email && <h3>{user?.providerData[0].email}</h3>}
             <button onClick={handleSignOut} className="cursor-pointer">
