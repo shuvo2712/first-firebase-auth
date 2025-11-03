@@ -9,3 +9,5 @@
 + npm install tailwindcss @tailwindcss/vite
 
 + npm i -D daisyui@latest
+
++ npm install lucide-react
